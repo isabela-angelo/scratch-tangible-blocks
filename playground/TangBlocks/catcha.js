@@ -1,5 +1,11 @@
 
+transformPosition = function(position) {
 
+
+
+
+	return  new_position;
+}
 
 window.ARThreeOnLoad = function() {
 
@@ -34,9 +40,9 @@ window.ARThreeOnLoad = function() {
 		arController.addEventListener('getMarker', function(ev) {
 			var barcodeId = ev.data.marker.idMatrix;
 			if (barcodeId !== -1) {
-				console.log("saw a barcode marker with id", barcodeId);
+
 				//console.log("teste: ", Object.getOwnPropertyNames(ev.data));
-				console.log("position: ", ev.data.marker.pos);
+
 
 				// Note that you need to copy the values of the transformation matrix,
 				// as the event transformation matrix is reused for each marker event
@@ -51,18 +57,18 @@ window.ARThreeOnLoad = function() {
 					}
 					detectedBarcodeMarkers[barcodeId].visible = true;
 					detectedBarcodeMarkers[barcodeId].pos.push(ev.data.marker.pos);
+					console.log("saw a barcode marker with id", barcodeId);
+					console.log("position x: ", detectedBarcodeMarkers[barcodeId].pos[0]);
 					detectedBarcodeMarkers[barcodeId].matrix.set(transform);
-					if (barcodeId == 9) { // INICIAL BLOCK
-							xml = greenFlag_block;
-	    		}
-					if (detectedBarcodeMarkers[9]) {
-						xml = xml.replace(/(<next>)<\//g,
-	          '$1' + meow_block + '</');
-						xml = '<xml xmlns="http://www.w3.org/1999/xhtml">' + xml + '</xml>';
-						var dom = window.Blockly.Xml.textToDom(xml);
-						window.Blockly.Xml.domToWorkspace(dom, workspace);
-						console.log("teste");
-					}
+					var toolbox = document.getElementById('toolbox');
+	        var blocks = toolbox.getElementsByTagName('block');
+	        var blockXML = blocks[code_to_block[barcodeId]];
+	        var block = window.Blockly.Xml.domToBlock(blockXML, workspace);
+	        block.initSvg();
+					//var interface_position = transformPosition(ev.data.marker.pos);
+					//block.moveBy(interface_position[0],interface_position[1]);
+					//block.moveBy(0,0);
+					block.moveBy(ev.data.marker.pos[0],ev.data.marker.pos[1]);
 				}
 			}
 		});
@@ -86,7 +92,7 @@ window.ARThreeOnLoad = function() {
 
 var detectedBarcodeMarkers = {};
 
-var meow_block = [
+/*var meow_block = [
 '  <block type="motion_movesteps">',
 '    <value name="STEPS">',
 '      <shadow type="math_number">',
@@ -104,9 +110,13 @@ var greenFlag_block = [
 	'    <next></next>',
 	'  </block>'
 ].join('\n');
+*/
+
+var greenFlag_block = 75;
+var meow_block = 39;
 
 var code_to_block = {9:greenFlag_block, 20:meow_block};
-var xml = "";
+//var xml = "";
 
 if (window.ARController && ARController.getUserMediaThreeScene) {
 
