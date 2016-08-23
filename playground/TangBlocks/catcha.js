@@ -65,10 +65,14 @@ window.ARThreeOnLoad = function() {
 	        var blockXML = blocks[code_to_block[barcodeId]];
 	        var block = window.Blockly.Xml.domToBlock(blockXML, workspace);
 	        block.initSvg();
-					//var interface_position = transformPosition(ev.data.marker.pos);
-					//block.moveBy(interface_position[0],interface_position[1]);
-					//block.moveBy(0,0);
-					block.moveBy(ev.data.marker.pos[0],ev.data.marker.pos[1]);
+					/*var interface_position = transformPosition(ev.data.marker.pos);
+					block.moveBy(interface_position[0],interface_position[1]);
+					if (barcodeId != 0) {
+						var moveEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.MOVE, blockId: block.id,
+							newParentId: last_id}, workspace);
+						moveEvent.run(true);
+					}
+					last_id = block.id;*/
 				}
 			}
 		});
@@ -91,31 +95,14 @@ window.ARThreeOnLoad = function() {
 };
 
 var detectedBarcodeMarkers = {};
-
-/*var meow_block = [
-'  <block type="motion_movesteps">',
-'    <value name="STEPS">',
-'      <shadow type="math_number">',
-'				<field name="NUM">10</field>',
-'			 </shadow>',
-'    </value>',
-'    <next></next>',
-'  </block>'
-].join('\n');
-
-
-
-var greenFlag_block = [
-	'  <block type="event_whenflagclicked">',
-	'    <next></next>',
-	'  </block>'
-].join('\n');
-*/
+var last_id = "";
 
 var greenFlag_block = 75;
 var meow_block = 39;
+var drum_block = 43;
+var note_block = 46;
 
-var code_to_block = {9:greenFlag_block, 20:meow_block};
+var code_to_block = {0:greenFlag_block, 1:meow_block, 2:drum_block, 3:note_block};
 //var xml = "";
 
 if (window.ARController && ARController.getUserMediaThreeScene) {
