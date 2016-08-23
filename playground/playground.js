@@ -121,10 +121,16 @@ window.onload = function() {
     // Handlers for green flag and stop all.
     document.getElementById('greenflag').addEventListener('click', function() {
         vm.greenFlag();
+
     });
     document.getElementById('stopall').addEventListener('click', function() {
         vm.stopAll();
     });
+
+    document.getElementById('getblocks').addEventListener('click', function() {
+        createBlocksInScratch();
+    });
+
 
     var tabBlockExplorer = document.getElementById('tab-blockexplorer');
     var tabThreadExplorer = document.getElementById('tab-threadexplorer');

@@ -1,8 +1,23 @@
+createBlocksInScratch = function() {
+	var last_id = "";
+	for (var i = 0; i < codes_detected.length; i++) {
+		var toolbox = document.getElementById('toolbox');
+		var blocks = toolbox.getElementsByTagName('block');
+		var blockXML = blocks[code_to_block[codes_detected[i]]];
+		var block = window.Blockly.Xml.domToBlock(blockXML, workspace);
+		block.initSvg();
 
+		if (last_id.localeCompare("") != 0) {
+			child_id = block.id;
+			parent_id = last_id;
+			var moveEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.MOVE, blockId: child_id,
+				newParentId: parent_id}, workspace);
+			moveEvent.run(true);
+		}
+		last_id = block.id;
+	}
+}
 transformPosition = function(position) {
-
-
-
 
 	return  new_position;
 }
@@ -44,10 +59,10 @@ window.ARThreeOnLoad = function() {
 				//console.log("teste: ", Object.getOwnPropertyNames(ev.data));
 
 
-				// Note that you need to copy the values of the transformation matrix,
-				// as the event transformation matrix is reused for each marker event
-				// sent by an ARController.
-				//
+				/* Note:
+				- Equal blocks are not recognized (just one of them)
+				- Blocks need to be organized before running the script so the blocks will be placed right in the Scratch Script
+				*/
 				var transform = ev.data.matrix;
 				if (!detectedBarcodeMarkers[barcodeId]) {
 					detectedBarcodeMarkers[barcodeId] = {
@@ -60,11 +75,8 @@ window.ARThreeOnLoad = function() {
 					console.log("saw a barcode marker with id", barcodeId);
 					console.log("position x: ", detectedBarcodeMarkers[barcodeId].pos[0]);
 					detectedBarcodeMarkers[barcodeId].matrix.set(transform);
-					var toolbox = document.getElementById('toolbox');
-	        var blocks = toolbox.getElementsByTagName('block');
-	        var blockXML = blocks[code_to_block[barcodeId]];
-	        var block = window.Blockly.Xml.domToBlock(blockXML, workspace);
-	        block.initSvg();
+					codes_detected.push(barcodeId);
+
 					/*var interface_position = transformPosition(ev.data.marker.pos);
 					block.moveBy(interface_position[0],interface_position[1]);
 					if (barcodeId != 0) {
@@ -95,7 +107,7 @@ window.ARThreeOnLoad = function() {
 };
 
 var detectedBarcodeMarkers = {};
-var last_id = "";
+var codes_detected = [];
 
 var greenFlag_block = 75;
 var meow_block = 39;
