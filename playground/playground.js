@@ -128,6 +128,7 @@ window.onload = function() {
     });
 
     document.getElementById('getblocks').addEventListener('click', function() {
+        stop_reading = true;
         createBlocksInScratch();
     });
 

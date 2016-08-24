@@ -1,9 +1,25 @@
+var stop_reading = false;
+var detectedBarcodeMarkers = {};
+var codes_detected = [];
+
+var greenFlag_block = 75;
+var meow_block = 39;
+var drum_block = 43;
+var note_block = 46;
+
+var code_to_block = {0:greenFlag_block, 1:meow_block, 2:drum_block, 3:note_block};
+
+
+
 createBlocksInScratch = function() {
+
 	var last_id = "";
-	for (var i = 0; i < codes_detected.length; i++) {
+	var codes = codes_detected;
+	console.log("teste codes ", codes);
+	for (var i = 0; i < codes.length; i++) {
 		var toolbox = document.getElementById('toolbox');
 		var blocks = toolbox.getElementsByTagName('block');
-		var blockXML = blocks[code_to_block[codes_detected[i]]];
+		var blockXML = blocks[code_to_block[codes[i]]];
 		var block = window.Blockly.Xml.domToBlock(blockXML, workspace);
 		block.initSvg();
 
@@ -16,6 +32,7 @@ createBlocksInScratch = function() {
 		}
 		last_id = block.id;
 	}
+	stop_reading = false;
 }
 transformPosition = function(position) {
 
@@ -54,9 +71,9 @@ window.ARThreeOnLoad = function() {
 
 		arController.addEventListener('getMarker', function(ev) {
 			var barcodeId = ev.data.marker.idMatrix;
-			if (barcodeId !== -1) {
+			if (barcodeId !== -1 && stop_reading == false) {
 
-				//console.log("teste: ", Object.getOwnPropertyNames(ev.data));
+
 
 
 				/* Note:
@@ -73,7 +90,7 @@ window.ARThreeOnLoad = function() {
 					detectedBarcodeMarkers[barcodeId].visible = true;
 					detectedBarcodeMarkers[barcodeId].pos.push(ev.data.marker.pos);
 					console.log("saw a barcode marker with id", barcodeId);
-					console.log("position x: ", detectedBarcodeMarkers[barcodeId].pos[0]);
+					//console.log("position x: ", detectedBarcodeMarkers[barcodeId].pos[0]);
 					detectedBarcodeMarkers[barcodeId].matrix.set(transform);
 					codes_detected.push(barcodeId);
 
@@ -86,6 +103,27 @@ window.ARThreeOnLoad = function() {
 					}
 					last_id = block.id;*/
 				}
+				if (detectedBarcodeMarkers[0] && barcodeId == 0) {
+					//console.log("teste codes_detected ", codes_detected);
+					detectedBarcodeMarkers = {};
+					//console.log("teste detectedBarcodeMarkers ", detectedBarcodeMarkers);
+					codes_detected = [];
+					//console.log("teste codes_detected ", codes_detected);
+					detectedBarcodeMarkers[barcodeId] = {
+						visible: true,
+						pos: [],
+						matrix: new Float32Array(16)
+					}
+					detectedBarcodeMarkers[barcodeId].visible = true;
+					detectedBarcodeMarkers[barcodeId].pos.push(ev.data.marker.pos);
+					console.log("saw a barcode marker with id", barcodeId);
+					//console.log("position x: ", detectedBarcodeMarkers[barcodeId].pos[0]);
+					detectedBarcodeMarkers[barcodeId].matrix.set(transform);
+					codes_detected.push(barcodeId);
+					//console.log("teste detectedBarcodeMarkers ", detectedBarcodeMarkers);
+					//console.log("teste codes_detected ", codes_detected);
+				}
+
 			}
 		});
 
@@ -106,15 +144,6 @@ window.ARThreeOnLoad = function() {
 
 };
 
-var detectedBarcodeMarkers = {};
-var codes_detected = [];
-
-var greenFlag_block = 75;
-var meow_block = 39;
-var drum_block = 43;
-var note_block = 46;
-
-var code_to_block = {0:greenFlag_block, 1:meow_block, 2:drum_block, 3:note_block};
 //var xml = "";
 
 if (window.ARController && ARController.getUserMediaThreeScene) {
