@@ -5,9 +5,12 @@ var codes_detected = [];
 var greenFlag_block = 75;
 var meow_block = 39;
 var drum_block = 43;
-var note_block = 46;
+var echo_block = 49;
+var no_effect_block = 51;
 
-var code_to_block = {0:greenFlag_block, 1:meow_block, 2:drum_block, 3:note_block};
+
+
+var code_to_block = {0:greenFlag_block, 1:meow_block, 2:drum_block, 3:echo_block, 4: no_effect_block};
 
 
 
@@ -89,7 +92,7 @@ window.ARThreeOnLoad = function() {
 					}
 					detectedBarcodeMarkers[barcodeId].visible = true;
 					detectedBarcodeMarkers[barcodeId].pos.push(ev.data.marker.pos);
-					console.log("saw a barcode marker with id", barcodeId);
+					//console.log("saw a barcode marker with id", barcodeId);
 					//console.log("position x: ", detectedBarcodeMarkers[barcodeId].pos[0]);
 					detectedBarcodeMarkers[barcodeId].matrix.set(transform);
 					codes_detected.push(barcodeId);
@@ -116,7 +119,7 @@ window.ARThreeOnLoad = function() {
 					}
 					detectedBarcodeMarkers[barcodeId].visible = true;
 					detectedBarcodeMarkers[barcodeId].pos.push(ev.data.marker.pos);
-					console.log("saw a barcode marker with id", barcodeId);
+					//console.log("saw a barcode marker with id", barcodeId);
 					//console.log("position x: ", detectedBarcodeMarkers[barcodeId].pos[0]);
 					detectedBarcodeMarkers[barcodeId].matrix.set(transform);
 					codes_detected.push(barcodeId);
