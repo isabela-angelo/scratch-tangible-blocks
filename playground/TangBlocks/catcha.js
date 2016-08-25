@@ -1,6 +1,7 @@
 var stop_reading = false;
 var detectedBarcodeMarkers = {};
 var codes_detected = [];
+var last_codes_detected = [];
 var old_ids = []
 
 var greenFlag_block = 75;
@@ -13,7 +14,14 @@ var no_effect_block = 51;
 
 var code_to_block = {0:greenFlag_block, 1:meow_block, 2:drum_block, 3:echo_block, 4: no_effect_block};
 
-
+invert_list_order = function(list) {
+  var list_inverted = [];
+  list_inverted.push(list[0]);
+  for (var i = list.length - 1; i > 0; i--) {
+    list_inverted.push(list[i]);
+  }
+  return list_inverted;
+}
 
 createBlocksInScratch = function() {
   if (old_ids.length != 0){
@@ -22,8 +30,10 @@ createBlocksInScratch = function() {
     delete_blocks.run(true);
     old_ids = [];
   }
+  console.log("teste last_codes_detected ", last_codes_detected);
+  last_codes_detected = invert_list_order(last_codes_detected);
 	var last_id = "";
-	var codes = codes_detected;
+	var codes = last_codes_detected;
 	console.log("teste codes ", codes);
 	for (var i = 0; i < codes.length; i++) {
 		var toolbox = document.getElementById('toolbox');
@@ -118,6 +128,7 @@ window.ARThreeOnLoad = function() {
 					//console.log("teste codes_detected ", codes_detected);
 					detectedBarcodeMarkers = {};
 					//console.log("teste detectedBarcodeMarkers ", detectedBarcodeMarkers);
+          last_codes_detected = codes_detected;
 					codes_detected = [];
 					//console.log("teste codes_detected ", codes_detected);
 					detectedBarcodeMarkers[barcodeId] = {
