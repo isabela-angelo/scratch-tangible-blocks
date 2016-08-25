@@ -1,6 +1,7 @@
 var stop_reading = false;
 var detectedBarcodeMarkers = {};
 var codes_detected = [];
+var old_ids = []
 
 var greenFlag_block = 75;
 var meow_block = 39;
@@ -15,7 +16,12 @@ var code_to_block = {0:greenFlag_block, 1:meow_block, 2:drum_block, 3:echo_block
 
 
 createBlocksInScratch = function() {
-
+  if (old_ids.length != 0){
+    var delete_blocks = new window.Blockly.Events.fromJson({type: Blockly.Events.DELETE,
+      ids: old_ids}, workspace);
+    moveEvent.run(true);
+    old_ids = [];
+  }
 	var last_id = "";
 	var codes = codes_detected;
 	console.log("teste codes ", codes);
@@ -25,17 +31,19 @@ createBlocksInScratch = function() {
 		var blockXML = blocks[code_to_block[codes[i]]];
 		var block = window.Blockly.Xml.domToBlock(blockXML, workspace);
 		block.initSvg();
+    old_ids.push(block.id);
 
 		if (last_id.localeCompare("") != 0) {
 			child_id = block.id;
 			parent_id = last_id;
 			var moveEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.MOVE, blockId: child_id,
 				newParentId: parent_id}, workspace);
-			moveEvent.run(true);
+      moveEvent.run(true);
 		}
 		last_id = block.id;
 	}
 	stop_reading = false;
+  old_codes = codes_detected;
 }
 transformPosition = function(position) {
 
