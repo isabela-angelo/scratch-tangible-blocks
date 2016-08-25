@@ -19,7 +19,7 @@ createBlocksInScratch = function() {
   if (old_ids.length != 0){
     var delete_blocks = new window.Blockly.Events.fromJson({type: Blockly.Events.DELETE,
       ids: old_ids}, workspace);
-    moveEvent.run(true);
+    delete_blocks.run(true);
     old_ids = [];
   }
 	var last_id = "";
