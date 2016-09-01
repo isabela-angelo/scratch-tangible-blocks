@@ -1,6 +1,6 @@
-var stop_reading = false;
-var detectedBarcodeMarkers = {};
-var codes_detected = [];
+var stop_reading = false;  //when the system is creating the blocks in Scratch, the reading of the codes stops
+var detectedBarcodeMarkers = {}; //detected codes and its attributes
+var codes_detected = []; // an array of the detected codes numbers
 
 var greenFlag_block = 75;
 var meow_block = 39;
@@ -13,12 +13,13 @@ var no_effect_block = 51;
 var code_to_block = {0:greenFlag_block, 1:meow_block, 2:drum_block, 3:echo_block, 4: no_effect_block};
 
 
-
+// method to create the blocks in Scratch
 createBlocksInScratch = function() {
 
-	var last_id = "";
+	var last_id = ""; // save the last block id created in Scratch so it can be used to connect to the next one
 	var codes = codes_detected;
 	console.log("teste codes ", codes);
+	// loop to create the blocks and connect them
 	for (var i = 0; i < codes.length; i++) {
 		var toolbox = document.getElementById('toolbox');
 		var blocks = toolbox.getElementsByTagName('block');
@@ -31,7 +32,7 @@ createBlocksInScratch = function() {
 			parent_id = last_id;
 			var moveEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.MOVE, blockId: child_id,
 				newParentId: parent_id}, workspace);
-			moveEvent.run(true);
+			moveEvent.run(true); // Event to connect the blocks
 		}
 		last_id = block.id;
 	}
@@ -72,17 +73,10 @@ window.ARThreeOnLoad = function() {
 
 
 
-		arController.addEventListener('getMarker', function(ev) {
+		arController.addEventListener('getMarker', function(ev) { // event that a marker was recognized
 			var barcodeId = ev.data.marker.idMatrix;
 			if (barcodeId !== -1 && stop_reading == false) {
 
-
-
-
-				/* Note:
-				- Equal blocks are not recognized (just one of them)
-				- Blocks need to be organized before running the script so the blocks will be placed right in the Scratch Script
-				*/
 				var transform = ev.data.matrix;
 				if (!detectedBarcodeMarkers[barcodeId]) {
 					detectedBarcodeMarkers[barcodeId] = {
@@ -96,22 +90,10 @@ window.ARThreeOnLoad = function() {
 					//console.log("position x: ", detectedBarcodeMarkers[barcodeId].pos[0]);
 					detectedBarcodeMarkers[barcodeId].matrix.set(transform);
 					codes_detected.push(barcodeId);
-
-					/*var interface_position = transformPosition(ev.data.marker.pos);
-					block.moveBy(interface_position[0],interface_position[1]);
-					if (barcodeId != 0) {
-						var moveEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.MOVE, blockId: block.id,
-							newParentId: last_id}, workspace);
-						moveEvent.run(true);
-					}
-					last_id = block.id;*/
 				}
 				if (detectedBarcodeMarkers[0] && barcodeId == 0) {
-					//console.log("teste codes_detected ", codes_detected);
 					detectedBarcodeMarkers = {};
-					//console.log("teste detectedBarcodeMarkers ", detectedBarcodeMarkers);
 					codes_detected = [];
-					//console.log("teste codes_detected ", codes_detected);
 					detectedBarcodeMarkers[barcodeId] = {
 						visible: true,
 						pos: [],
@@ -119,12 +101,8 @@ window.ARThreeOnLoad = function() {
 					}
 					detectedBarcodeMarkers[barcodeId].visible = true;
 					detectedBarcodeMarkers[barcodeId].pos.push(ev.data.marker.pos);
-					//console.log("saw a barcode marker with id", barcodeId);
-					//console.log("position x: ", detectedBarcodeMarkers[barcodeId].pos[0]);
 					detectedBarcodeMarkers[barcodeId].matrix.set(transform);
 					codes_detected.push(barcodeId);
-					//console.log("teste detectedBarcodeMarkers ", detectedBarcodeMarkers);
-					//console.log("teste codes_detected ", codes_detected);
 				}
 
 			}
@@ -135,7 +113,6 @@ window.ARThreeOnLoad = function() {
 
 			arScene.renderOn(renderer);
 			requestAnimationFrame(tick);
-			//console.log(detectedBarcodeMarkers);
 
 		};
 
@@ -147,7 +124,6 @@ window.ARThreeOnLoad = function() {
 
 };
 
-//var xml = "";
 
 if (window.ARController && ARController.getUserMediaThreeScene) {
 
