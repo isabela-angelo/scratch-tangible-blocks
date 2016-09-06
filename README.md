@@ -1,3 +1,20 @@
+##############################################################################################################################################################################
+-> Ubuntu error "/usr/bin/env: node: No such file or directory"
+    Solution:
+
+    Some linux distributions install nodejs not as "node" executable but as "nodejs".
+
+    In this case you have to manually link to "node" as many packages are programmed after the "node" binary. Something similar also occurs with "python2" not linked to "python".
+
+    In this case you can do an easy symlink. For linux distributions which install package binaries to /usr/bin you can do
+
+    ln -s /usr/bin/nodejs /usr/bin/node
+
+-> Error tone:
+
+    "npm install tone"
+
+########################################################################################################################################################################################
 ## scratch-vm
 #### Scratch VM is a library for representing, running, and maintaining the state of computer programs written using [Scratch Blocks](https://github.com/LLK/scratch-blocks).
 

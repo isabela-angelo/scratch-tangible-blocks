@@ -1,8 +1,10 @@
+
 var stop_reading = false; //when the system is creating the blocks in Scratch, the reading of the codes stops
 var detectedBarcodeMarkers = {};  //detected codes and its attributes
 var codes_detected = []; // an array of the detected codes numbers
 var last_codes_detected = []; // an array of the last detected codes numbers
 var old_ids = [] // ids of the blocks that was created in Scratch last time
+
 
 // numbers of the blocks in Scratch
 var greenFlag_block = 75;
@@ -26,6 +28,7 @@ invert_list_order = function(list) {
 // method to create the blocks in Scratch
 createBlocksInScratch = function() {
 
+
 	// loop to delete the blocks that are in Scratch Script
   if (old_ids.length != 0){
     var delete_blocks = new window.Blockly.Events.fromJson({type: Blockly.Events.DELETE,
@@ -37,6 +40,7 @@ createBlocksInScratch = function() {
   last_codes_detected = invert_list_order(last_codes_detected);
 	var last_id = ""; // save the last block id created in Scratch so it can be used to connect to the next one
 	var codes = last_codes_detected;
+
 	console.log("teste codes ", codes);
 	// loop to create the blocks and connect them
 	for (var i = 0; i < codes.length; i++) {
@@ -52,7 +56,9 @@ createBlocksInScratch = function() {
 			parent_id = last_id;
 			var moveEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.MOVE, blockId: child_id,
 				newParentId: parent_id}, workspace);
+
       moveEvent.run(true); // Event to connect the blocks
+
 		}
 		last_id = block.id;
 	}
@@ -137,6 +143,7 @@ window.ARThreeOnLoad = function() {
 	}});
 	delete window.ARThreeOnLoad;
 };
+
 if (window.ARController && ARController.getUserMediaThreeScene) {
 	ARThreeOnLoad();
 }
