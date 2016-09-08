@@ -15,7 +15,7 @@ function VirtualMachine () {
 	// MUSIC STUFF by ericr
 
     // tone setup
-    
+
     var tone = new Tone();
 
     Tone.Transport.start();
@@ -23,11 +23,11 @@ function VirtualMachine () {
     // var quantizeUnit = '@8n';
     var quantizeUnit = '0';
 
-    // effects 
+    // effects
 
     var delay = new Tone.FeedbackDelay(0.25, 0.5);
     delay.wet.value = 0;
-    
+
     var pitchShift = new Tone.PitchShift();
 
     var panner = new Tone.Panner();
@@ -38,9 +38,9 @@ function VirtualMachine () {
     Tone.Master.chain(delay, pitchShift, panner, reverb);
 
     // synth setup for play note block
-    
+
 	var synth = new Tone.PolySynth(6, Tone.Synth).toMaster();
-	
+
     // drum sounds
 
     var drumFileNames = ['high_conga', 'small_cowbell', 'snare_drum', 'splash cymbal'];
@@ -55,7 +55,7 @@ function VirtualMachine () {
 
     function loadSoundFiles(filenames) {
         var samplers = [];
-        
+
         for (var name of filenames) {
 
             var myVoices = [];
@@ -76,7 +76,7 @@ function VirtualMachine () {
 
         return samplers;
     }
-	
+
     // should fire once all sounds are loaded - seems to not work
     Tone.Buffer.onload = function() {
         console.log('loaded audio samples');
@@ -90,10 +90,10 @@ function VirtualMachine () {
 		'PENTATONIC': [0, 2, 4, 7, 9],
 		'CHROMATIC' : [0,1,2,3,4,5,6,7,8,9,10,11],
 	};
-	
+
 	var currentScale = scales['MAJOR'];
 	var rootNote = 60;
-	
+
 
     function scaleNoteToMidiNote(scaleNote, scale, root) {
 		var scaleIndex = (Math.round(scaleNote) - 1) % scale.length;
@@ -101,10 +101,10 @@ function VirtualMachine () {
 			scaleIndex += scale.length;
 		}
 		var octave = Math.floor((scaleNote - 1) / scale.length);
-		var midiNote = root + (octave * 12) + scale[scaleIndex]; 
+		var midiNote = root + (octave * 12) + scale[scaleIndex];
 		return midiNote;
-	} 
-	
+	}
+
 	function midiToFreq(midiNote) {
 		var freq = tone.intervalToFrequencyRatio(midiNote - 60) * 261.63; // 60 is C4
 		return freq;
@@ -117,7 +117,7 @@ function VirtualMachine () {
     function playNoteForBeats(note, beats) {
         var midiNote = scaleNoteToMidiNote(note, currentScale, rootNote);
         var freq = midiToFreq(midiNote);
-        synth.triggerAttackRelease(freq, beats, quantizeUnit);        
+        synth.triggerAttackRelease(freq, beats, quantizeUnit);
     }
 
     // onmessage calls are converted into emitted events.

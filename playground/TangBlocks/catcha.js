@@ -25,6 +25,13 @@ invert_list_order = function(list) {
   return list_inverted;
 }
 
+getPosition = function(pos) {
+  var pos_2 = [];
+  pos_2[0] = pos[0].toFixed(2);
+  pos_2[1] = pos[1].toFixed(2);
+  return pos_2;
+}
+
 // method to create the blocks in Scratch
 createBlocksInScratch = function() {
 
@@ -81,15 +88,15 @@ window.ARThreeOnLoad = function() {
 
 		var renderer = new THREE.WebGLRenderer({antialias: true});
 		if (arController.orientation === 'portrait') {
-			var w = (window.innerWidth / arController.videoHeight) * arController.videoWidth;
-			var h = window.innerWidth;
+			//var w = (window.innerWidth / arController.videoHeight) * arController.videoWidth;
+			//var h = window.innerWidth;
 			//renderer.setSize(w, h);
-			renderer.domElement.style.paddingBottom = (w-h) + 'px';
+			//renderer.domElement.style.paddingBottom = (w-h) + 'px';
 		} else {
 			if (/Android|mobile|iPad|iPhone/i.test(navigator.userAgent)) {
 				//renderer.setSize(window.innerWidth, (window.innerWidth / arController.videoWidth) * arController.videoHeight);
 			} else {
-				//renderer.setSize(arController.videoWidth, arController.videoHeight);
+				renderer.setSize(arController.videoWidth, arController.videoHeight);
 				document.body.className += ' desktop';
 			}
 		}
@@ -111,12 +118,14 @@ window.ARThreeOnLoad = function() {
 						matrix: new Float32Array(16)
 					}
 					detectedBarcodeMarkers[barcodeId].visible = true;
-					detectedBarcodeMarkers[barcodeId].pos.push(ev.data.marker.pos);
-					//console.log("saw a barcode marker with id", barcodeId);
-					//console.log("position x: ", detectedBarcodeMarkers[barcodeId].pos[0]);
+          detectedBarcodeMarkers[barcodeId].pos.push(getPosition(ev.data.marker.pos));
+					//detectedBarcodeMarkers[barcodeId].pos.push(ev.data.marker.pos);
+					console.log("saw a barcode marker with id", barcodeId);
+					console.log("position x: ", detectedBarcodeMarkers[barcodeId].pos[0]);
 					detectedBarcodeMarkers[barcodeId].matrix.set(transform);
 					codes_detected.push(barcodeId);
 				}
+        
 				if (detectedBarcodeMarkers[0] && barcodeId == 0) {
 					detectedBarcodeMarkers = {};
           last_codes_detected = codes_detected;
@@ -127,7 +136,8 @@ window.ARThreeOnLoad = function() {
 						matrix: new Float32Array(16)
 					}
 					detectedBarcodeMarkers[barcodeId].visible = true;
-					detectedBarcodeMarkers[barcodeId].pos.push(ev.data.marker.pos);
+          detectedBarcodeMarkers[barcodeId].pos.push(getPosition(ev.data.marker.pos));
+					//detectedBarcodeMarkers[barcodeId].pos.push(ev.data.marker.pos);
 					detectedBarcodeMarkers[barcodeId].matrix.set(transform);
 					codes_detected.push(barcodeId);
 				}
