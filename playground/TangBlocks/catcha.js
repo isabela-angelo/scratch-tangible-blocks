@@ -27,8 +27,8 @@ invert_list_order = function(list) {
 
 getPosition = function(pos) {
   var pos_2 = [];
-  pos_2[0] = pos[0].toFixed(2);
-  pos_2[1] = pos[1].toFixed(2);
+  pos_2[0] = parseInt(pos[0].toFixed(2));
+  pos_2[1] = parseInt(pos[1].toFixed(2));
   return pos_2;
 }
 
@@ -120,12 +120,20 @@ window.ARThreeOnLoad = function() {
 					detectedBarcodeMarkers[barcodeId].visible = true;
           detectedBarcodeMarkers[barcodeId].pos.push(getPosition(ev.data.marker.pos));
 					//detectedBarcodeMarkers[barcodeId].pos.push(ev.data.marker.pos);
-					console.log("saw a barcode marker with id", barcodeId);
-					console.log("position x: ", detectedBarcodeMarkers[barcodeId].pos[0]);
+					//console.log("saw a barcode marker with id", barcodeId);
+					//console.log("position x: ", detectedBarcodeMarkers[barcodeId].pos[0]);
 					detectedBarcodeMarkers[barcodeId].matrix.set(transform);
 					codes_detected.push(barcodeId);
 				}
-        
+        else {
+          if (checkBlock(detectedBarcodeMarkers[barcodeId].pos, getPosition(ev.data.marker.pos)) == -1) {
+              detectedBarcodeMarkers[barcodeId].pos.push(getPosition(ev.data.marker.pos));
+              console.log("pos ", detectedBarcodeMarkers[barcodeId].pos[1]);
+              detectedBarcodeMarkers[barcodeId].visible = true;
+              detectedBarcodeMarkers[barcodeId].matrix.set(transform);
+    					codes_detected.push(barcodeId);
+          }
+        }
 				if (detectedBarcodeMarkers[0] && barcodeId == 0) {
 					detectedBarcodeMarkers = {};
           last_codes_detected = codes_detected;
