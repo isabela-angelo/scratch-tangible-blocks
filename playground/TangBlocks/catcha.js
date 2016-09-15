@@ -16,6 +16,16 @@ var no_effect_block = 51;
 // codes and blocks in Scratch
 var code_to_block = {0:greenFlag_block, 1:meow_block, 2:drum_block, 3:echo_block, 4: no_effect_block};
 
+checkBlock = function(list, item) {
+  var obj;
+  for (i = 0; i<list.length; i++) {
+    if (list[i][0] == item[0] && list[i][1] == item[1]) {
+      return 1;
+    }
+  }
+  return -1;
+}
+
 invert_list_order = function(list) {
   var list_inverted = [];
   list_inverted.push(list[0]);
