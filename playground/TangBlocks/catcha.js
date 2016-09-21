@@ -16,6 +16,7 @@ var no_effect_block = 51;
 // codes and blocks in Scratch
 var code_to_block = {0:greenFlag_block, 1:meow_block, 2:drum_block, 3:echo_block, 4: no_effect_block};
 
+// check if the block regognized has already been added to the codes_detected list
 checkBlock = function(list, item) {
   var obj;
   for (i = 0; i<list.length; i++) {
@@ -23,7 +24,7 @@ checkBlock = function(list, item) {
       return 1;
     }
   }
-  return -1;
+  return -1; // the block is not in the list
 }
 
 invert_list_order = function(list) {
@@ -37,8 +38,8 @@ invert_list_order = function(list) {
 
 getPosition = function(pos) {
   var pos_2 = [];
-  pos_2[0] = parseInt(pos[0].toFixed(2));
-  pos_2[1] = parseInt(pos[1].toFixed(2));
+  pos_2[0] = parseFloat(pos[0].toFixed(2));
+  pos_2[1] = parseFloat(pos[1].toFixed(2));
   return pos_2;
 }
 
@@ -131,19 +132,22 @@ window.ARThreeOnLoad = function() {
           detectedBarcodeMarkers[barcodeId].pos.push(getPosition(ev.data.marker.pos));
 					//detectedBarcodeMarkers[barcodeId].pos.push(ev.data.marker.pos);
 					//console.log("saw a barcode marker with id", barcodeId);
-					//console.log("position x: ", detectedBarcodeMarkers[barcodeId].pos[0]);
+					//console.log("position : ", detectedBarcodeMarkers[barcodeId].pos[0]);
 					detectedBarcodeMarkers[barcodeId].matrix.set(transform);
 					codes_detected.push(barcodeId);
 				}
         else {
           if (checkBlock(detectedBarcodeMarkers[barcodeId].pos, getPosition(ev.data.marker.pos)) == -1) {
+          //if the barcode detected was not added to the list, add it
               detectedBarcodeMarkers[barcodeId].pos.push(getPosition(ev.data.marker.pos));
-              console.log("pos ", detectedBarcodeMarkers[barcodeId].pos[1]);
+              //console.log("again saw a barcode marker with id", barcodeId);
+    					//console.log("position : ", detectedBarcodeMarkers[barcodeId].pos[1]);
               detectedBarcodeMarkers[barcodeId].visible = true;
               detectedBarcodeMarkers[barcodeId].matrix.set(transform);
     					codes_detected.push(barcodeId);
           }
         }
+        // restart the list with the first block, the green flag
 				if (detectedBarcodeMarkers[0] && barcodeId == 0) {
 					detectedBarcodeMarkers = {};
           last_codes_detected = codes_detected;
