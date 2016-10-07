@@ -16,6 +16,9 @@ var no_effect_block = 51;
 // codes and blocks in Scratch
 var code_to_block = {0:greenFlag_block, 1:meow_block, 2:drum_block, 3:echo_block, 4: no_effect_block};
 
+// code 4 -> green flag button TO TEST!
+var green_flag_count = 0;
+
 // check if the block regognized has already been added to the codes_detected list
 checkBlock = function(list, item) {
   var obj;
@@ -119,6 +122,19 @@ window.ARThreeOnLoad = function() {
 
 
 		arController.addEventListener('getMarker', function(ev) { // event that a marker was recognized
+
+      if (last_codes_detected.length > 0) {
+        if (last_codes_detected.indexOf(4) == -1 && green_flag_count < 1000) {
+          green_flag_count ++;
+        }
+        else {
+          green_flag_count = 0;
+        }
+        if (green_flag_count == 1000) {
+          vm.greenFlag();
+        }
+      }
+
 			var barcodeId = ev.data.marker.idMatrix;
 			if (barcodeId !== -1 && stop_reading == false) {
 				var transform = ev.data.matrix;
