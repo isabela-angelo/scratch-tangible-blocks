@@ -14,7 +14,7 @@ var echo_block = 49;
 var no_effect_block = 51;
 
 // codes and blocks in Scratch
-var code_to_block = {0:greenFlag_block, 1:meow_block, 2:drum_block, 3:echo_block, 4: no_effect_block};
+var code_to_block = {0:greenFlag_block, 1:meow_block, 2:drum_block, 3:play_pith, 4: wait, 5: repeat, 6: end_repeat, 7: par_1, 8: par_meow};
 
 // code 4 -> green flag button TO TEST!
 var green_flag_count = 0;
@@ -139,18 +139,26 @@ window.ARThreeOnLoad = function() {
 			if (barcodeId !== -1 && stop_reading == false) {
 				var transform = ev.data.matrix;
 				if (!detectedBarcodeMarkers[barcodeId]) {
-					detectedBarcodeMarkers[barcodeId] = {
-						visible: true,
-						pos: [],
-						matrix: new Float32Array(16)
-					}
-					detectedBarcodeMarkers[barcodeId].visible = true;
-          detectedBarcodeMarkers[barcodeId].pos.push(getPosition(ev.data.marker.pos));
-					//detectedBarcodeMarkers[barcodeId].pos.push(ev.data.marker.pos);
-					//console.log("saw a barcode marker with id", barcodeId);
-					//console.log("position : ", detectedBarcodeMarkers[barcodeId].pos[0]);
-					detectedBarcodeMarkers[barcodeId].matrix.set(transform);
-					codes_detected.push(barcodeId);
+          // if the code is for a parameter, ignore it
+          if (barcodeId < 7) {
+  					detectedBarcodeMarkers[barcodeId] = {
+  						visible: true,
+  						pos: [],
+  						matrix: new Float32Array(16)
+  					}
+  					detectedBarcodeMarkers[barcodeId].visible = true;
+            detectedBarcodeMarkers[barcodeId].pos.push(getPosition(ev.data.marker.pos));
+  					//detectedBarcodeMarkers[barcodeId].pos.push(ev.data.marker.pos);
+  					//console.log("saw a barcode marker with id", barcodeId);
+  					//console.log("position : ", detectedBarcodeMarkers[barcodeId].pos[0]);
+  					detectedBarcodeMarkers[barcodeId].matrix.set(transform);
+  					codes_detected.push(barcodeId);
+          }
+          else {
+            //set the parameter to the method (pos of parameter is (x + w, y) the position of the method (x, y))
+            var pos_test = getPosition(ev.data.marker.pos);
+
+          }
 				}
         else {
           if (checkBlock(detectedBarcodeMarkers[barcodeId].pos, getPosition(ev.data.marker.pos)) == -1) {
