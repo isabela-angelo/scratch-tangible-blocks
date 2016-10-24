@@ -3,8 +3,8 @@ var stop_reading = false; //when the system is creating the blocks in Scratch, t
 var detectedBarcodeMarkers = {};  //detected codes and its attributes
 var codes_detected = []; // an array of the detected codes numbers
 var last_codes_detected = []; // an array of the last detected codes numbers
-var old_ids = [] // ids of the blocks that was created in Scratch last time
-
+var old_ids = []; // ids of the blocks that was created in Scratch last time
+var par_list = []; // parameters of funtions (like numbers, strings...)
 
 // numbers of the blocks in Scratch
 var greenFlag_block = 75;
@@ -13,7 +13,7 @@ var drum_block = 43;
 var echo_block = 49;
 var no_effect_block = 51;
 
-// codes and blocks in Scratch
+// codes and blocks or parameters in Scratch
 var code_to_block = {0:greenFlag_block, 1:meow_block, 2:drum_block, 3:play_pith, 4: wait, 5: repeat, 6: end_repeat, 7: par_1, 8: par_meow};
 
 // code 4 -> green flag button TO TEST!
@@ -139,7 +139,7 @@ window.ARThreeOnLoad = function() {
 			if (barcodeId !== -1 && stop_reading == false) {
 				var transform = ev.data.matrix;
 				if (!detectedBarcodeMarkers[barcodeId]) {
-          // if the code is for a parameter, ignore it
+          // if the code is for a parameter, put it in the parameters list
           if (barcodeId < 7) {
   					detectedBarcodeMarkers[barcodeId] = {
   						visible: true,
@@ -156,7 +156,9 @@ window.ARThreeOnLoad = function() {
           }
           else {
             //set the parameter to the method (pos of parameter is (x + w, y) the position of the method (x, y))
-            var pos_test = getPosition(ev.data.marker.pos);
+            // probably the parameter order in the list is the parameter order to put in the function list TEST IT!
+            //var pos_test = getPosition(ev.data.marker.pos);
+            par_list.push(code_to_block[barcodeId]);
 
           }
 				}
