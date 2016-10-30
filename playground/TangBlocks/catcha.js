@@ -10,11 +10,13 @@ var par_list = []; // parameters of funtions (like numbers, strings...)
 var greenFlag_block = 75;
 var meow_block = 39;
 var drum_block = 43;
-var echo_block = 49;
-var no_effect_block = 51;
+var play_pith = 41;
+var wait = 83;
+var repeat = 84;
+var end_repeat = 84.5;
 
 // codes and blocks or parameters in Scratch
-var code_to_block = {0:greenFlag_block, 1:meow_block, 2:drum_block, 3:play_pith, 4: wait, 5: repeat, 6: end_repeat, 7: par_1, 8: par_meow};
+var code_to_block = {0:greenFlag_block, 1:meow_block, 2:drum_block, 3:play_pith, 4: wait, 5: repeat, 6: end_repeat, 7: "1", 8: "meow"};
 
 // code 4 -> green flag button TO TEST!
 var green_flag_count = 0;
@@ -48,8 +50,8 @@ getPosition = function(pos) {
 
 // method to create the blocks in Scratch
 createBlocksInScratch = function() {
-
-
+  var flag_end_repeat = false;  //flag to put the next block outside the repeat
+  var last_repeat_id = ""; // block id of the last repeat found
 	// loop to delete the blocks that are in Scratch Script
   if (old_ids.length != 0){
     var delete_blocks = new window.Blockly.Events.fromJson({type: Blockly.Events.DELETE,
@@ -75,10 +77,28 @@ createBlocksInScratch = function() {
 		if (last_id.localeCompare("") != 0) {
 			child_id = block.id;
 			parent_id = last_id;
-			var moveEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.MOVE, blockId: child_id,
-				newParentId: parent_id}, workspace);
+      if (code_to_block[codes[i-1]] == 84 and code_to_block[codes[i]] != 84.5) { // if last block was a loop
+        last_repeat_id = last_id; // save id
 
-      moveEvent.run(true); // Event to connect the blocks
+
+      }
+      else if (code_to_block[codes[i]] == 84.5) {
+        flag_end_repeat = true; // the next block will be outside the repeat
+      }
+      else {
+        if (flag_end_repeat) {
+          var moveEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.MOVE, blockId: child_id,
+                newParentId: last_repeat_id}, workspace);
+          moveEvent.run(true); // Event to connect the blocks
+          flag_end_repeat = false;
+        }
+        else {
+          var moveEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.MOVE, blockId: child_id,
+  				         newParentId: parent_id}, workspace);
+          moveEvent.run(true); // Event to connect the blocks
+        }
+
+      }
 
 		}
 		last_id = block.id;
