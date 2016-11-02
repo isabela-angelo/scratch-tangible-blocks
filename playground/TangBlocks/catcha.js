@@ -64,44 +64,45 @@ createBlocksInScratch = function() {
 	var last_id = ""; // save the last block id created in Scratch so it can be used to connect to the next one
 	var codes = last_codes_detected;
 
-	console.log("teste codes ", codes);
+
+  codes = [0, 1, 5, 1, 2, 6, 2];
+  console.log("teste codes ", codes);
 	// loop to create the blocks and connect them
 	for (var i = 0; i < codes.length; i++) {
-		var toolbox = document.getElementById('toolbox');
-		var blocks = toolbox.getElementsByTagName('block');
-		var blockXML = blocks[code_to_block[codes[i]]];
-		var block = window.Blockly.Xml.domToBlock(blockXML, workspace);
-		block.initSvg();
-    old_ids.push(block.id);
+    if (code_to_block[codes[i]] == 84.5) {
+      flag_end_repeat = true; // the next block will be outside the repeat
+    }
+    else {
+  		var toolbox = document.getElementById('toolbox');
+  		var blocks = toolbox.getElementsByTagName('block');
+  		var blockXML = blocks[code_to_block[codes[i]]];
+  		var block = window.Blockly.Xml.domToBlock(blockXML, workspace);
+  		block.initSvg();
+      old_ids.push(block.id);
 
-		if (last_id.localeCompare("") != 0) {
-			child_id = block.id;
-			parent_id = last_id;
-      if (code_to_block[codes[i-1]] == 84 and code_to_block[codes[i]] != 84.5) { // if last block was a loop
-        last_repeat_id = last_id; // save id
-
-
-      }
-      else if (code_to_block[codes[i]] == 84.5) {
-        flag_end_repeat = true; // the next block will be outside the repeat
-      }
-      else {
-        if (flag_end_repeat) {
+  		if (last_id.localeCompare("") != 0) {
+  			child_id = block.id;
+  			parent_id = last_id;
+        if (code_to_block[codes[i-1]] != null && code_to_block[codes[i-1]] == 84) { // if last block was a loop
+          last_repeat_id = last_id; // save id
           var moveEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.MOVE, blockId: child_id,
-                newParentId: last_repeat_id}, workspace);
+                   newParentId: parent_id, newInputName: "SUBSTACK"}, workspace);
           moveEvent.run(true); // Event to connect the blocks
-          flag_end_repeat = false;
+
         }
         else {
+          if (flag_end_repeat) {
+            flag_end_repeat = false;
+            parent_id = last_repeat_id;
+          }
           var moveEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.MOVE, blockId: child_id,
-  				         newParentId: parent_id}, workspace);
+                   newParentId: parent_id}, workspace);
           moveEvent.run(true); // Event to connect the blocks
         }
 
-      }
-
-		}
-		last_id = block.id;
+  		}
+  		last_id = block.id;
+    }
 	}
 	stop_reading = false;
   old_codes = codes_detected;
@@ -143,17 +144,17 @@ window.ARThreeOnLoad = function() {
 
 		arController.addEventListener('getMarker', function(ev) { // event that a marker was recognized
 
-      if (last_codes_detected.length > 0) {
-        if (last_codes_detected.indexOf(4) == -1 && green_flag_count < 1000) {
-          green_flag_count ++;
-        }
-        else {
-          green_flag_count = 0;
-        }
-        if (green_flag_count == 1000) {
-          vm.greenFlag();
-        }
-      }
+      //if (last_codes_detected.length > 0) {
+        //if (last_codes_detected.indexOf(4) == -1 && green_flag_count < 1000) {
+          //green_flag_count ++;
+        //}
+        //else {
+          //green_flag_count = 0;
+        //}
+        //if (green_flag_count == 1000) {
+          //vm.greenFlag();
+        //}
+      //}
 
 			var barcodeId = ev.data.marker.idMatrix;
 			if (barcodeId !== -1 && stop_reading == false) {
