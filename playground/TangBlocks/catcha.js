@@ -14,12 +14,29 @@ var play_pith = 41;
 var wait = 83;
 var repeat = 84;
 var end_repeat = 84.5;
+var green_flag_button = 0.5;
 
 // codes and blocks or parameters in Scratch
-var code_to_block = {0:greenFlag_block, 1:meow_block, 2:drum_block, 3:play_pith, 4: wait, 5: repeat, 6: end_repeat, 7: "1", 8: "meow"};
+var code_to_block = {0:greenFlag_block, 1:meow_block, 2:drum_block, 3:play_pith,
+  4: wait, 5: repeat, 6: end_repeat, 7: "1", 8: "meow", 9: "10", 63: green_flag_button};
 
 // code 4 -> green flag button TO TEST!
 var green_flag_count = 0;
+
+// play the info of the new blocks in the script
+check_new_blocks = function(list, last_list) {
+  if (last_list.length < list.length) {
+    for (var i = 0; i <last_list.length; i++) {
+      if (list[i] != last_list[i]) {
+        //console.log("play sound ", list[i]);
+        return;
+      }
+    }
+    //console.log("play sound ", list[list.length-1]);
+    //play the sound of the last block in list
+  }
+}
+
 
 // check if the block regognized has already been added to the codes_detected list
 checkBlock = function(list, item) {
@@ -60,19 +77,17 @@ createBlocksInScratch = function() {
     old_ids = [];
   }
   console.log("teste last_codes_detected ", last_codes_detected);
-  last_codes_detected = invert_list_order(last_codes_detected);
+  var codes = invert_list_order(last_codes_detected);
 	var last_id = ""; // save the last block id created in Scratch so it can be used to connect to the next one
-	var codes = last_codes_detected;
 
-
-  codes = [0, 1, 5, 1, 2, 6, 2];
+  //codes = [0, 1, 5, 1, 2, 6, 2];
   console.log("teste codes ", codes);
 	// loop to create the blocks and connect them
 	for (var i = 0; i < codes.length; i++) {
     if (code_to_block[codes[i]] == 84.5) {
       flag_end_repeat = true; // the next block will be outside the repeat
     }
-    else {
+    else if (code_to_block[codes[i]] != 0.5){
   		var toolbox = document.getElementById('toolbox');
   		var blocks = toolbox.getElementsByTagName('block');
   		var blockXML = blocks[code_to_block[codes[i]]];
@@ -104,8 +119,8 @@ createBlocksInScratch = function() {
   		last_id = block.id;
     }
 	}
-	stop_reading = false;
   old_codes = codes_detected;
+  stop_reading = false;
 }
 transformPosition = function(position) {
 
@@ -144,24 +159,30 @@ window.ARThreeOnLoad = function() {
 
 		arController.addEventListener('getMarker', function(ev) { // event that a marker was recognized
 
-      //if (last_codes_detected.length > 0) {
-        //if (last_codes_detected.indexOf(4) == -1 && green_flag_count < 1000) {
-          //green_flag_count ++;
-        //}
-        //else {
-          //green_flag_count = 0;
-        //}
-        //if (green_flag_count == 1000) {
-          //vm.greenFlag();
-        //}
-      //}
+      // ckeck green flag "button" - some seconds hiding the block and the code run
+      if (last_codes_detected.length > 0) {
+        if (last_codes_detected.indexOf(63) == -1 && green_flag_count < 700) {
+          green_flag_count ++;
+        }
+        else {
+          green_flag_count = 0;
+        }
+        if (green_flag_count == 500) {
+          stop_reading = true;
+          createBlocksInScratch();
+        }
+        if (green_flag_count == 700) {          
+          console.log("stop_reading ", stop_reading);
+          window.vm.greenFlag();  // green flag "pressed"
+        }
+      }
 
 			var barcodeId = ev.data.marker.idMatrix;
 			if (barcodeId !== -1 && stop_reading == false) {
 				var transform = ev.data.matrix;
 				if (!detectedBarcodeMarkers[barcodeId]) {
           // if the code is for a parameter, put it in the parameters list
-          if (barcodeId < 7) {
+          if (barcodeId < 7 || barcodeId == 63) {
   					detectedBarcodeMarkers[barcodeId] = {
   						visible: true,
   						pos: [],
@@ -175,6 +196,7 @@ window.ARThreeOnLoad = function() {
   					detectedBarcodeMarkers[barcodeId].matrix.set(transform);
   					codes_detected.push(barcodeId);
           }
+
           else {
             //set the parameter to the method (pos of parameter is (x + w, y) the position of the method (x, y))
             // probably the parameter order in the list is the parameter order to put in the function list TEST IT!
@@ -197,8 +219,10 @@ window.ARThreeOnLoad = function() {
         // restart the list with the first block, the green flag
 				if (detectedBarcodeMarkers[0] && barcodeId == 0) {
 					detectedBarcodeMarkers = {};
+          check_new_blocks(codes_detected, last_codes_detected);
           last_codes_detected = codes_detected;
 					codes_detected = [];
+          par_list = [];
 					detectedBarcodeMarkers[barcodeId] = {
 						visible: true,
 						pos: [],
