@@ -95,6 +95,11 @@ createBlocksInScratch = function() {
   		block.initSvg();
       old_ids.push(block.id);
 
+      //var changeEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.CHANGE, blockId: block.id,
+               //element: "field", name: "NUM", newValue: par_list.pop()}, workspace);
+      //changeEvent.run(true); // Event to change parameter
+
+
   		if (last_id.localeCompare("") != 0) {
   			child_id = block.id;
   			parent_id = last_id;
@@ -171,7 +176,7 @@ window.ARThreeOnLoad = function() {
           stop_reading = true;
           createBlocksInScratch();
         }
-        if (green_flag_count == 700) {          
+        if (green_flag_count == 700) {
           console.log("stop_reading ", stop_reading);
           window.vm.greenFlag();  // green flag "pressed"
         }
@@ -181,7 +186,7 @@ window.ARThreeOnLoad = function() {
 			if (barcodeId !== -1 && stop_reading == false) {
 				var transform = ev.data.matrix;
 				if (!detectedBarcodeMarkers[barcodeId]) {
-          // if the code is for a parameter, put it in the parameters list
+          // if the code is not for a parameter, put it in the codes_detected list
           if (barcodeId < 7 || barcodeId == 63) {
   					detectedBarcodeMarkers[barcodeId] = {
   						visible: true,
