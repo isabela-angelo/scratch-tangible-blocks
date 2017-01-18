@@ -80,7 +80,7 @@ Scratch3SoundBlocks.prototype.playDrum = function (args, util) {
     return new Promise(function(resolve) {
           setTimeout(function() {
               resolve();
-          }, (1000 * 2) );
+          }, (1000 * 1) );
       });
 };
 

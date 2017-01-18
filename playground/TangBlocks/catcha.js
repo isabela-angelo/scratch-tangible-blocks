@@ -161,19 +161,24 @@ window.ARThreeOnLoad = function() {
 
       // ckeck green flag "button" - some seconds hiding the block and the code run
       if (last_codes_detected.length > 0) {
-        if (last_codes_detected.indexOf(63) == -1 && green_flag_count < 700) {
-          green_flag_count ++;
+        if (last_codes_detected.indexOf(63) == -1) {
+          if (green_flag_count < 400) {
+            green_flag_count ++;
+          }
         }
         else {
           green_flag_count = 0;
         }
-        if (green_flag_count == 500) {
+        if (green_flag_count == 200) {
           stop_reading = true;
           createBlocksInScratch();
+          green_flag_count ++;
         }
-        if (green_flag_count == 700) {          
-          console.log("stop_reading ", stop_reading);
+        if (green_flag_count == 300) {
+          //console.log("stop_reading ", stop_reading);
+          console.log("green_flag_count : ", green_flag_count);
           window.vm.greenFlag();  // green flag "pressed"
+          green_flag_count ++;
         }
       }
 
@@ -216,10 +221,10 @@ window.ARThreeOnLoad = function() {
     					codes_detected.push(barcodeId);
           }
         }
-        // restart the list with the first block, the green flag
+        // restart the list with the first block: the green flag
 				if (detectedBarcodeMarkers[0] && barcodeId == 0) {
 					detectedBarcodeMarkers = {};
-          check_new_blocks(codes_detected, last_codes_detected);
+          //check_new_blocks(codes_detected, last_codes_detected);
           last_codes_detected = codes_detected;
 					codes_detected = [];
           par_list = [];
