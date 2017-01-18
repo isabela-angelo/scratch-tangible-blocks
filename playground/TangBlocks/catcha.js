@@ -80,7 +80,8 @@ createBlocksInScratch = function() {
   var codes = invert_list_order(last_codes_detected);
 	var last_id = ""; // save the last block id created in Scratch so it can be used to connect to the next one
 
-  //codes = [0, 1, 5, 1, 2, 6, 2];
+  codes = [0, 4];
+  par_list = [9];
   console.log("teste codes ", codes);
 	// loop to create the blocks and connect them
 	for (var i = 0; i < codes.length; i++) {
@@ -92,12 +93,19 @@ createBlocksInScratch = function() {
   		var blocks = toolbox.getElementsByTagName('block');
   		var blockXML = blocks[code_to_block[codes[i]]];
   		var block = window.Blockly.Xml.domToBlock(blockXML, workspace);
+      //if (code_to_block[codes[i]] == 83) {
+        //console.log("lalal ", Object.getOwnPropertyNames(block));
+        //console.log(block.childBlocks_);
+        //console.log(block.childBlocks_[0]);
+      //}
   		block.initSvg();
       old_ids.push(block.id);
-
-      //var changeEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.CHANGE, blockId: block.id,
-               //element: "field", name: "NUM", newValue: par_list.pop()}, workspace);
-      //changeEvent.run(true); // Event to change parameter
+      console.log ("id:", block.id)
+      if (code_to_block[codes[i]] == 83) {
+        var changeEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.CHANGE, blockId: block.childBlocks_[0].id,
+                element: "field", name: "NUM", newValue: code_to_block[par_list.pop()]}, workspace);
+        changeEvent.run(true); // Event to change parameter
+      }
 
 
   		if (last_id.localeCompare("") != 0) {
@@ -191,13 +199,13 @@ window.ARThreeOnLoad = function() {
 			if (barcodeId !== -1 && stop_reading == false) {
 				var transform = ev.data.matrix;
 				if (!detectedBarcodeMarkers[barcodeId]) {
+          detectedBarcodeMarkers[barcodeId] = {
+            visible: true,
+            pos: [],
+            matrix: new Float32Array(16)
+          }
           // if the code is not for a parameter, put it in the codes_detected list
           if (barcodeId < 7 || barcodeId == 63) {
-  					detectedBarcodeMarkers[barcodeId] = {
-  						visible: true,
-  						pos: [],
-  						matrix: new Float32Array(16)
-  					}
   					detectedBarcodeMarkers[barcodeId].visible = true;
             detectedBarcodeMarkers[barcodeId].pos.push(getPosition(ev.data.marker.pos));
   					//detectedBarcodeMarkers[barcodeId].pos.push(ev.data.marker.pos);
@@ -211,6 +219,8 @@ window.ARThreeOnLoad = function() {
             //set the parameter to the method (pos of parameter is (x + w, y) the position of the method (x, y))
             // probably the parameter order in the list is the parameter order to put in the function list TEST IT!
             //var pos_test = getPosition(ev.data.marker.pos);
+            detectedBarcodeMarkers[barcodeId].visible = true;
+            detectedBarcodeMarkers[barcodeId].pos.push(getPosition(ev.data.marker.pos));
             par_list.push(code_to_block[barcodeId]);
 
           }
@@ -218,12 +228,20 @@ window.ARThreeOnLoad = function() {
         else {
           if (checkBlock(detectedBarcodeMarkers[barcodeId].pos, getPosition(ev.data.marker.pos)) == -1) {
           //if the barcode detected was not added to the list, add it
+            if (barcodeId < 7 || barcodeId == 63) {
+              // if the code is not for a parameter, put it in the codes_detected list
               detectedBarcodeMarkers[barcodeId].pos.push(getPosition(ev.data.marker.pos));
               //console.log("again saw a barcode marker with id", barcodeId);
     					//console.log("position : ", detectedBarcodeMarkers[barcodeId].pos[1]);
               detectedBarcodeMarkers[barcodeId].visible = true;
               detectedBarcodeMarkers[barcodeId].matrix.set(transform);
     					codes_detected.push(barcodeId);
+            }
+            else {
+              detectedBarcodeMarkers[barcodeId].visible = true;
+              detectedBarcodeMarkers[barcodeId].pos.push(getPosition(ev.data.marker.pos));
+              par_list.push(code_to_block[barcodeId]);
+            }
           }
         }
         // restart the list with the first block: the green flag
