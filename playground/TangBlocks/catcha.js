@@ -4,7 +4,8 @@ var detectedBarcodeMarkers = {};  //detected codes and its attributes
 var codes_detected = []; // an array of the detected codes numbers
 var last_codes_detected = []; // an array of the last detected codes numbers
 var old_ids = []; // ids of the blocks that was created in Scratch last time
-var par_list = []; // parameters of funtions (like numbers, strings...)
+var par_list = [];
+var par_list_last = []; // parameters of funtions (like numbers, strings...)
 
 // numbers of the blocks in Scratch
 var greenFlag_block = 75;
@@ -18,7 +19,9 @@ var green_flag_button = 0.5;
 
 // codes and blocks or parameters in Scratch
 var code_to_block = {0:greenFlag_block, 1:meow_block, 2:drum_block, 3:play_pith,
-  4: wait, 5: repeat, 6: end_repeat, 7: "1", 8: "meow", 9: "10", 63: green_flag_button};
+  4: wait, 5: repeat, 6: end_repeat,
+  10: 0, 11: 1, 12: 2, 13: 3, 14: 4, 15: 5, 16: 6, 17: 7, 18: 8, 19: 9,20: 10,
+  63: green_flag_button};
 
 // code 4 -> green flag button TO TEST!
 var green_flag_count = 0;
@@ -51,10 +54,18 @@ checkBlock = function(list, item) {
 
 invert_list_order = function(list) {
   var list_inverted = [];
-  list_inverted.push(list[0]);
-  for (var i = list.length - 1; i > 0; i--) {
-    list_inverted.push(list[i]);
+  if (list[0] == 0) { // if the list starts with 0 (the green flag block) just invert the order of the other blocks
+    list_inverted.push(list[0]); // start with zero (green flag block)
+    for (var i = list.length - 1; i > 0; i--) {
+      list_inverted.push(list[i]);
+    }
   }
+  else {
+    for (var i = list.length - 1; i >= 0; i--) {
+      list_inverted.push(list[i]);
+    }
+  }
+  console.log("teste list_inverted ", list_inverted);
   return list_inverted;
 }
 
@@ -77,12 +88,18 @@ createBlocksInScratch = function() {
     old_ids = [];
   }
   console.log("teste last_codes_detected ", last_codes_detected);
+  console.log("teste par_list_last ", par_list_last);
   var codes = invert_list_order(last_codes_detected);
+  var pars = invert_list_order(par_list_last);
 	var last_id = ""; // save the last block id created in Scratch so it can be used to connect to the next one
 
-  codes = [0, 4];
-  par_list = [9];
+  // DEBUG!!!
+  //codes = [0, 5, 1, 6];
+  //par_list = [12, 13];
+
+
   console.log("teste codes ", codes);
+  console.log("teste pars ", pars);
 	// loop to create the blocks and connect them
 	for (var i = 0; i < codes.length; i++) {
     if (code_to_block[codes[i]] == 84.5) {
@@ -93,20 +110,47 @@ createBlocksInScratch = function() {
   		var blocks = toolbox.getElementsByTagName('block');
   		var blockXML = blocks[code_to_block[codes[i]]];
   		var block = window.Blockly.Xml.domToBlock(blockXML, workspace);
-      //if (code_to_block[codes[i]] == 83) {
-        //console.log("lalal ", Object.getOwnPropertyNames(block));
-        //console.log(block.childBlocks_);
+      if (code_to_block[codes[i]] == 84) {
+        console.log("lalal ", Object.getOwnPropertyNames(block));
+        console.log(block);
         //console.log(block.childBlocks_[0]);
-      //}
+      }
   		block.initSvg();
       old_ids.push(block.id);
       console.log ("id:", block.id)
+      //add the parameter to wait block
       if (code_to_block[codes[i]] == 83) {
         var changeEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.CHANGE, blockId: block.childBlocks_[0].id,
-                element: "field", name: "NUM", newValue: code_to_block[par_list.pop()]}, workspace);
+                element: "field", name: "NUM", newValue: code_to_block[pars.shift()]}, workspace);
         changeEvent.run(true); // Event to change parameter
       }
-
+      //add the parameter to play sound block
+      if (code_to_block[codes[i]] == 39) {
+        var changeEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.CHANGE, blockId: block.childBlocks_[0].id,
+                element: "field", name: "SOUND_MENU", newValue: code_to_block[pars.shift()]}, workspace);
+        changeEvent.run(true); // Event to change parameter
+      }
+      //add the parameter to play drum block
+      if (code_to_block[codes[i]] == 43) {
+        var changeEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.CHANGE, blockId: block.childBlocks_[0].id,
+                element: "field", name: "NUM", newValue: code_to_block[pars.shift()]}, workspace);
+        changeEvent.run(true); // Event to change parameter
+      }
+      //add the parameter to play sound with pitch block
+      if (code_to_block[codes[i]] == 41) {
+        var changeEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.CHANGE, blockId: block.childBlocks_[0].id,
+                element: "field", name: "SOUND_MENU", newValue: code_to_block[pars.shift()]}, workspace);
+        changeEvent.run(true); // Event to change parameter
+        changeEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.CHANGE, blockId: block.childBlocks_[1].id,
+                element: "field", name: "NUM", newValue: code_to_block[pars.shift()]}, workspace);
+        changeEvent.run(true); // Event to change parameter
+      }
+      //add the parameter to repeat block
+      if (code_to_block[codes[i]] == 84) {
+        var changeEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.CHANGE, blockId: block.childBlocks_[0].id,
+                element: "field", name: "NUM", newValue: code_to_block[pars.shift()]}, workspace);
+        changeEvent.run(true); // Event to change parameter
+      }
 
   		if (last_id.localeCompare("") != 0) {
   			child_id = block.id;
@@ -176,7 +220,7 @@ window.ARThreeOnLoad = function() {
       if (last_codes_detected.length > 0) {
         if (last_codes_detected.indexOf(63) == -1) {
           if (green_flag_count < 400) {
-            green_flag_count ++;
+            //green_flag_count ++;
           }
         }
         else {
@@ -219,9 +263,10 @@ window.ARThreeOnLoad = function() {
             //set the parameter to the method (pos of parameter is (x + w, y) the position of the method (x, y))
             // probably the parameter order in the list is the parameter order to put in the function list TEST IT!
             //var pos_test = getPosition(ev.data.marker.pos);
+            //console.log("saw a barcode marker with id", barcodeId);
             detectedBarcodeMarkers[barcodeId].visible = true;
             detectedBarcodeMarkers[barcodeId].pos.push(getPosition(ev.data.marker.pos));
-            par_list.push(code_to_block[barcodeId]);
+            par_list.push(barcodeId);
 
           }
 				}
@@ -238,9 +283,10 @@ window.ARThreeOnLoad = function() {
     					codes_detected.push(barcodeId);
             }
             else {
+              //console.log("saw a barcode marker with id", barcodeId);
               detectedBarcodeMarkers[barcodeId].visible = true;
               detectedBarcodeMarkers[barcodeId].pos.push(getPosition(ev.data.marker.pos));
-              par_list.push(code_to_block[barcodeId]);
+              par_list.push(barcodeId);
             }
           }
         }
@@ -250,6 +296,8 @@ window.ARThreeOnLoad = function() {
           //check_new_blocks(codes_detected, last_codes_detected);
           last_codes_detected = codes_detected;
 					codes_detected = [];
+          //console.log("par_list : ", par_list);
+          par_list_last = par_list;
           par_list = [];
 					detectedBarcodeMarkers[barcodeId] = {
 						visible: true,
