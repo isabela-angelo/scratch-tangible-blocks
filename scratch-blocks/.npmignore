@@ -1,0 +1,14 @@
+# OSX
+.DS_Store
+
+# NPM
+/node_modules
+npm-*
+
+# Localization / I18N
+common.pyc
+.settings
+.project
+*.pyc
+*.komodoproject
+/nbproject/private/

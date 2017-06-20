@@ -94,8 +94,8 @@ createBlocksInScratch = function() {
 	var last_id = ""; // save the last block id created in Scratch so it can be used to connect to the next one
 
   // DEBUG!!!
-  //codes = [0, 5, 1, 6];
-  //par_list = [12, 13];
+  codes = [0, 5, 1, 6];
+  pars = [12, 13];
 
 
   console.log("teste codes ", codes);
@@ -126,8 +126,13 @@ createBlocksInScratch = function() {
       }
       //add the parameter to play sound block
       if (code_to_block[codes[i]] == 39) {
+        // something is wrong with the change event in dropdown menus (error when the block is  deleted)
+        // for now: no dropdown menus in blocks -> it is a number input area
+        // var changeEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.CHANGE, blockId: block.childBlocks_[0].id,
+        //         element: "field", name: "SOUND_MENU", newValue: code_to_block[pars.shift()]}, workspace);
+        // changeEvent.run(true); // Event to change parameter
         var changeEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.CHANGE, blockId: block.childBlocks_[0].id,
-                element: "field", name: "SOUND_MENU", newValue: code_to_block[pars.shift()]}, workspace);
+                element: "field", name: "NUM", newValue: code_to_block[pars.shift()]}, workspace);
         changeEvent.run(true); // Event to change parameter
       }
       //add the parameter to play drum block
