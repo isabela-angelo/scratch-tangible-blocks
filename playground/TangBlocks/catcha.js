@@ -183,11 +183,29 @@ createBlocksInScratch = function() {
 	}
   old_codes = codes_detected;
   stop_reading = false;
+
 }
 transformPosition = function(position) {
 
 	return  new_position;
 }
+
+
+document.addEventListener('keydown', function (e) {
+  if(e.keyCode == 32) {
+    console.log("space key");
+    var createBlocks = new Promise(function(resolve) {
+          createBlocksInScratch();
+          setTimeout(function() {
+              resolve();
+          }, (1000 * 2) );
+    });
+    createBlocks.then(function() {
+      window.vm.greenFlag();
+    });
+    e.preventDefault();
+  }
+});
 
 window.ARThreeOnLoad = function() {
 
@@ -216,7 +234,6 @@ window.ARThreeOnLoad = function() {
 		renderer.setSize(0, 0);
 
 		document.body.insertBefore(renderer.domElement, document.body.firstChild);
-
 
 
 		arController.addEventListener('getMarker', function(ev) { // event that a marker was recognized
