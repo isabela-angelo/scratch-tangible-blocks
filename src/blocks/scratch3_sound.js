@@ -33,6 +33,29 @@ Scratch3SoundBlocks.prototype.getPrimitives = function() {
 
 Scratch3SoundBlocks.prototype.playSound = function (args, util) {
 	self.postMessage({method: 'playsound', soundnum:args.SOUND_NUM});
+  console.log("num=", args.SOUND_NUM);
+  if (args.SOUND_NUM == 0 || args.SOUND_NUM == 1) {
+    return new Promise(function(resolve) {
+        setTimeout(function() {
+            resolve();
+        }, (2000) );
+    });
+  }
+  else if (args.SOUND_NUM == 2) {
+    return new Promise(function(resolve) {
+        setTimeout(function() {
+            resolve();
+        }, (5000) );
+    });
+
+  }
+  else {
+    return new Promise(function(resolve) {
+        setTimeout(function() {
+            resolve();
+        }, (7000) );
+    });
+  }
 };
 
 Scratch3SoundBlocks.prototype.playSoundWithPitch = function (args, util) {
@@ -67,6 +90,11 @@ Scratch3SoundBlocks.prototype.playDrumForBeats = function (args, util) {
 
 Scratch3SoundBlocks.prototype.playDrum = function (args, util) {
     self.postMessage({method: 'playdrum', drum:args.DRUMTYPE});
+    return new Promise(function(resolve) {
+          setTimeout(function() {
+              resolve();
+          }, (3000) );
+      });
 
 };
 

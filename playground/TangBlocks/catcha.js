@@ -94,8 +94,8 @@ createBlocksInScratch = function() {
 	var last_id = ""; // save the last block id created in Scratch so it can be used to connect to the next one
 
   // DEBUG!!!
-  codes = [0, 5, 1, 6];
-  pars = [12, 13];
+  //codes = [0, 5, 1, 6];
+  //pars = [12, 13];
 
 
   console.log("teste codes ", codes);
@@ -138,7 +138,7 @@ createBlocksInScratch = function() {
       //add the parameter to play drum block
       if (code_to_block[codes[i]] == 43) {
         var changeEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.CHANGE, blockId: block.childBlocks_[0].id,
-                element: "field", name: "NUM", newValue: code_to_block[pars.shift()]}, workspace);
+                element: "field", name: "NUM", newValue: code_to_block[pars.shift()]+1}, workspace);
         changeEvent.run(true); // Event to change parameter
       }
       //add the parameter to play sound with pitch block
@@ -198,7 +198,7 @@ document.addEventListener('keydown', function (e) {
           createBlocksInScratch();
           setTimeout(function() {
               resolve();
-          }, (1000 * 2) );
+          }, (1000 * 5) );
     });
     createBlocks.then(function() {
       window.vm.greenFlag();

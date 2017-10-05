@@ -48,7 +48,7 @@ function VirtualMachine () {
 
     // sounds
 
-    var soundFileNames = ['meow','boing','this_is_a_test','who_put_the_bomp','cave','drip_drop','drum_machine','eggs','zoop'];
+    var soundFileNames = ['meow','boing', 'laugh', 'robot', 'this_is_a_test','who_put_the_bomp','cave','drip_drop','drum_machine','eggs','zoop'];
     var soundSamplers = loadSoundFiles(soundFileNames);
 
     // polyphonic samplers
