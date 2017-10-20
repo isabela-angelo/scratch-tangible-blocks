@@ -15,31 +15,11 @@ var play_pith = 41;
 var wait = 83;
 var repeat = 84;
 var end_repeat = 84.5;
-var green_flag_button = 0.5;
 
 // codes and blocks or parameters in Scratch
 var code_to_block = {0:greenFlag_block, 1:meow_block, 2:drum_block, 3:play_pith,
   4: wait, 5: repeat, 6: end_repeat,
-  10: 0, 11: 1, 12: 2, 13: 3, 14: 4, 15: 5, 16: 6, 17: 7, 18: 8, 19: 9,20: 10,
-  63: green_flag_button};
-
-// code 4 -> green flag button TO TEST!
-var green_flag_count = 0;
-
-// play the info of the new blocks in the script
-check_new_blocks = function(list, last_list) {
-  if (last_list.length < list.length) {
-    for (var i = 0; i <last_list.length; i++) {
-      if (list[i] != last_list[i]) {
-        //console.log("play sound ", list[i]);
-        return;
-      }
-    }
-    //console.log("play sound ", list[list.length-1]);
-    //play the sound of the last block in list
-  }
-}
-
+  10: 0, 11: 1, 12: 2, 13: 3, 14: 4, 15: 5, 16: 6, 17: 7, 18: 8, 19: 9,20: 10};
 
 // check if the block regognized has already been added to the codes_detected list
 checkBlock = function(list, item) {
@@ -52,6 +32,8 @@ checkBlock = function(list, item) {
   return -1; // the block is not in the list
 }
 
+// the recognition of the barcodes from the videos starts in the end of the image in the frame
+//so the list of codes recognized needs to be inverted
 invert_list_order = function(list) {
   var list_inverted = [];
   if (list[0] == 0) { // if the list starts with 0 (the green flag block) just invert the order of the other blocks
@@ -65,10 +47,14 @@ invert_list_order = function(list) {
       list_inverted.push(list[i]);
     }
   }
-  console.log("teste list_inverted ", list_inverted);
+
+  //console.log("teste list_inverted ", list_inverted);
+
   return list_inverted;
 }
 
+
+//get the position of the barcodes with two decimal numbers
 getPosition = function(pos) {
   var pos_2 = [];
   pos_2[0] = parseFloat(pos[0].toFixed(2));
@@ -110,14 +96,18 @@ createBlocksInScratch = function() {
   		var blocks = toolbox.getElementsByTagName('block');
   		var blockXML = blocks[code_to_block[codes[i]]];
   		var block = window.Blockly.Xml.domToBlock(blockXML, workspace);
-      if (code_to_block[codes[i]] == 84) {
-        console.log("lalal ", Object.getOwnPropertyNames(block));
-        console.log(block);
+
+      //if (code_to_block[codes[i]] == 84) {
+        //console.log("lalal ", Object.getOwnPropertyNames(block));
+        //console.log(block);
         //console.log(block.childBlocks_[0]);
-      }
+      //}
+
   		block.initSvg();
       old_ids.push(block.id);
-      console.log ("id:", block.id)
+
+      //console.log ("id:", block.id)
+
       //add the parameter to wait block
       if (code_to_block[codes[i]] == 83) {
         var changeEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.CHANGE, blockId: block.childBlocks_[0].id,
@@ -185,15 +175,12 @@ createBlocksInScratch = function() {
   stop_reading = false;
 
 }
-transformPosition = function(position) {
 
-	return  new_position;
-}
-
-
+// when the spcabar is pressed the blocks are created in Scratch and then the code runs
 document.addEventListener('keydown', function (e) {
   if(e.keyCode == 32) {
     console.log("space key");
+    stop_reading = true;
     var createBlocks = new Promise(function(resolve) {
           createBlocksInScratch();
           setTimeout(function() {
@@ -238,30 +225,7 @@ window.ARThreeOnLoad = function() {
 
 		arController.addEventListener('getMarker', function(ev) { // event that a marker was recognized
 
-      // ckeck green flag "button" - some seconds hiding the block and the code run
-      if (last_codes_detected.length > 0) {
-        if (last_codes_detected.indexOf(63) == -1) {
-          if (green_flag_count < 400) {
-            //green_flag_count ++;
-          }
-        }
-        else {
-          green_flag_count = 0;
-        }
-        if (green_flag_count == 200) {
-          stop_reading = true;
-          createBlocksInScratch();
-          green_flag_count ++;
-        }
-
-        if (green_flag_count == 700) {
-          console.log("stop_reading ", stop_reading);
-          window.vm.greenFlag();  // green flag "pressed"
-          green_flag_count ++;
-        }
-      }
-
-			var barcodeId = ev.data.marker.idMatrix;
+      var barcodeId = ev.data.marker.idMatrix;
 			if (barcodeId !== -1 && stop_reading == false) {
 				var transform = ev.data.matrix;
 				if (!detectedBarcodeMarkers[barcodeId]) {
@@ -275,17 +239,21 @@ window.ARThreeOnLoad = function() {
   					detectedBarcodeMarkers[barcodeId].visible = true;
             detectedBarcodeMarkers[barcodeId].pos.push(getPosition(ev.data.marker.pos));
   					//detectedBarcodeMarkers[barcodeId].pos.push(ev.data.marker.pos);
+
   					//console.log("saw a barcode marker with id", barcodeId);
   					//console.log("position : ", detectedBarcodeMarkers[barcodeId].pos[0]);
+
   					detectedBarcodeMarkers[barcodeId].matrix.set(transform);
   					codes_detected.push(barcodeId);
           }
 
           else {
             //set the parameter to the method (pos of parameter is (x + w, y) the position of the method (x, y))
-            // probably the parameter order in the list is the parameter order to put in the function list TEST IT!
+            //the parameter order in the list is the parameter order to put in the function list (in this specific prototype)
+
             //var pos_test = getPosition(ev.data.marker.pos);
             //console.log("saw a barcode marker with id", barcodeId);
+
             detectedBarcodeMarkers[barcodeId].visible = true;
             detectedBarcodeMarkers[barcodeId].pos.push(getPosition(ev.data.marker.pos));
             par_list.push(barcodeId);
@@ -298,14 +266,19 @@ window.ARThreeOnLoad = function() {
             if (barcodeId < 7 || barcodeId == 63) {
               // if the code is not for a parameter, put it in the codes_detected list
               detectedBarcodeMarkers[barcodeId].pos.push(getPosition(ev.data.marker.pos));
+
               //console.log("again saw a barcode marker with id", barcodeId);
     					//console.log("position : ", detectedBarcodeMarkers[barcodeId].pos[1]);
+
               detectedBarcodeMarkers[barcodeId].visible = true;
               detectedBarcodeMarkers[barcodeId].matrix.set(transform);
     					codes_detected.push(barcodeId);
             }
+            //if the code is for a parameter, put it in the par_list list
             else {
+
               //console.log("saw a barcode marker with id", barcodeId);
+
               detectedBarcodeMarkers[barcodeId].visible = true;
               detectedBarcodeMarkers[barcodeId].pos.push(getPosition(ev.data.marker.pos));
               par_list.push(barcodeId);
@@ -318,9 +291,13 @@ window.ARThreeOnLoad = function() {
           //check_new_blocks(codes_detected, last_codes_detected);
           last_codes_detected = codes_detected;
 					codes_detected = [];
+
           //console.log("par_list : ", par_list);
+
           par_list_last = par_list;
           par_list = [];
+
+          //add the green flag - 0 - in the list again
 					detectedBarcodeMarkers[barcodeId] = {
 						visible: true,
 						pos: [],
@@ -332,7 +309,7 @@ window.ARThreeOnLoad = function() {
 					detectedBarcodeMarkers[barcodeId].matrix.set(transform);
 					codes_detected.push(barcodeId);
 				}
-
+        //console.log("fim!!!!");
 			}
 		});
 		var tick = function() {
