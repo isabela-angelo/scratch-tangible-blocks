@@ -9,23 +9,19 @@
     "type": "git",
     "url": "git+ssh://git@github.com/LLK/scratch-vm.git"
   },
-  "main": "./src/index.js",
+  "main": "./dist/node/scratch-vm.js",
   "scripts": {
-    "test": "make test"
-  },
-  "dependencies": {
-    "htmlparser2": "3.9.0",
-    "promise": "7.1.1"
-  },
-  "devDependencies": {
-    "eslint": "2.7.0",
-    "highlightjs": "8.7.0",
-    "json-loader": "0.5.4",
-    "scratch-blocks": "git+https://git@github.com/LLK/scratch-blocks.git",
-    "scratch-render": "git+https://git@github.com/LLK/scratch-render.git",
-    "stats.js": "0.16.0",
-    "tap": "5.7.1",
-    "webpack": "1.13.0",
-    "webpack-dev-server": "1.14.1"
+    "build": "webpack --progress --colors --bail",
+    "coverage": "tap ./test/{unit,integration}/*.js --coverage --coverage-report=lcov",
+    "deploy": "touch playground/.nojekyll && gh-pages -t -d playground -m \"Build for $(git log --pretty=format:%H -n1)\"",
+    "lint": "eslint .",
+    "prepublish": "in-publish && npm run build || not-in-publish",
+    "start": "webpack-dev-server",
+    "tap": "tap ./test/{unit,integration}/*.js",
+    "tap:unit": "tap ./test/unit/*.js",
+    "tap:integration": "tap ./test/integration/*.js",
+    "test": "npm run lint && npm run tap",
+    "watch": "webpack --progress --colors --watch",
+    "version": "json -f package.json -I -e \"this.repository.sha = '$(git log -n1 --pretty=format:%H)'\""
   }
 }
