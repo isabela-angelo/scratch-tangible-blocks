@@ -1,11 +1,16 @@
-## scratch-vm
+
+
+## scratch-vm - modified by isabela-angelo
+
+### Tangible Programming Language for Blind Children
+
 #### Scratch VM is a library for representing, running, and maintaining the state of computer programs written using [Scratch Blocks](https://github.com/LLK/scratch-blocks).
 
 [![Build Status](https://travis-ci.org/LLK/scratch-vm.svg?branch=develop)](https://travis-ci.org/LLK/scratch-vm)
 [![Coverage Status](https://coveralls.io/repos/github/LLK/scratch-vm/badge.svg?branch=develop)](https://coveralls.io/github/LLK/scratch-vm?branch=develop)
 [![Greenkeeper badge](https://badges.greenkeeper.io/LLK/scratch-vm.svg)](https://greenkeeper.io/)
 
-## Installation
+## Installation -- JUST RUN THE SERVER -- DO NOT 'NPM INSTALL'
 This requires you to have Git and Node.js installed.
 
 To install as a dependency for your own application:
@@ -16,7 +21,7 @@ To set up a development environment to edit scratch-vm yourself:
 ```bash
 git clone https://github.com/LLK/scratch-vm.git
 cd scratch-vm
-npm install
+~~npm install~~
 ```
 
 ## Development Server
