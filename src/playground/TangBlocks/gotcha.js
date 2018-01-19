@@ -1,11 +1,11 @@
 
-var stop_reading = false; //when the system is creating the blocks in Scratch, the reading of the codes stops
-var detectedBarcodeMarkers = {};  //detected codes and its attributes
-var codes_detected = []; // an array of the detected codes numbers
-var last_codes_detected = []; // an array of the last detected codes numbers
+var stop_reading = false; //when the system is creating the blocks in Scratch, the marker recognition stops
+var detectedBarcodeMarkers = {};  //detected markers and its attributes
+var codes_detected = []; // an array of the detected markers numbers - command pieces
+var last_codes_detected = []; // an array of the last detected markers numbers - command pieces
 var old_ids = []; // ids of the blocks that was created in Scratch last time
-var par_list = [];
-var par_list_last = []; // parameters of funtions (like numbers, strings...)
+var par_list = []; // an array of the detected markers numbers - parameters of funtions (like numbers, strings...)
+var par_list_last = []; // an array of the last detected markers numbers - last parameters detected
 
 // numbers of the blocks in Scratch
 var greenFlag_block = 52;
@@ -17,7 +17,7 @@ var end_repeat = 61.5;
 var if_key_block = 65;
 var end_if_key_block = 65.5;
 
-// codes and blocks or parameters in Scratch
+// markers numbers and blocks in Scratch
 var code_to_block = {0:greenFlag_block, 1:meow_block, 2:drum_block, 4: wait, 5: repeat, 6: end_repeat, 7: if_key_block, 8: end_if_key_block,
   10: 0, 11: 1, 12: 2, 13: 3, 14: 4, 15: 5, 16: 6, 17: 7, 18: 8, 19: 9,
   21:'a', 22:'b', 23: 'c', 24: 'd', 25: 'e', 26: 'f', 27: 'g', 28: 'h', 29: 'i', 30: 'j', 31: 'k', 32: 'l',
@@ -25,7 +25,7 @@ var code_to_block = {0:greenFlag_block, 1:meow_block, 2:drum_block, 4: wait, 5: 
   45: 'y', 46: 'z'
 };
 
-// check if the block regognized has already been added to the codes_detected list - comparing the positions
+// check if the marker regognized has already been added to the codes_detected list - comparing the positions
 checkBlock = function(list, item) {
   var obj;
   for (i = 0; i<list.length; i++) {
@@ -33,15 +33,15 @@ checkBlock = function(list, item) {
       return 1;
     }
   }
-  return -1; // the block is not in the list
+  return -1; // the marker is not in the list
 }
 
-// the recognition of the barcodes from the videos starts in the end of the image in the frame
-//so the list of codes recognized needs to be inverted
+// the marker recognition from the videos starts in the end of the image in the frame
+//so the list of markers recognized needs to be inverted
 invert_list_order = function(list) {
   var list_inverted = [];
   if (list[0] == 0) { // if the list starts with 0 (the green flag block) just invert the order of the other blocks
-    list_inverted.push(list[0]); // start with zero (green flag block)
+    list_inverted.push(list[0]); // the new list starts with zero (green flag block)
     for (var i = list.length - 1; i > 0; i--) {
       list_inverted.push(list[i]);
     }
@@ -58,7 +58,7 @@ invert_list_order = function(list) {
 }
 
 
-//get the position of the barcodes with two decimal numbers
+//get the position of the markers with two decimal numbers
 getPosition = function(pos) {
   var pos_2 = [];
   pos_2[0] = parseFloat(pos[0].toFixed(2));
@@ -82,8 +82,8 @@ createBlocksInScratch = function() {
   }
   console.log("teste last_codes_detected ", last_codes_detected);
   console.log("teste par_list_last ", par_list_last);
-  // var codes = invert_list_order(last_codes_detected);
-  // var pars = invert_list_order(par_list_last);
+  var codes = invert_list_order(last_codes_detected);
+  var pars = invert_list_order(par_list_last);
 	var last_id = ""; // save the last block id created in Scratch so it can be used to connect to the next one
 
   console.log("teste codes ", codes);
@@ -98,6 +98,10 @@ createBlocksInScratch = function() {
     }
     else {
       if (code_to_block[codes[i]] == 65) {
+        //maybe the best way to create blocks are through the block XML
+        // -> you can create all the blocks with the right parameter at once
+        // -> possible problem: access to the XML of each block: it can be accessed and used or it requires a file with all the blocks XML saved?
+        //                      ids need to be created to each of the blocks? How?
         var xml = [
           ' <block type="control_wait_until" id="uU|sqMl9T(WO1qDu.PXn">',
           '      <value name="CONDITION">',
@@ -155,50 +159,58 @@ createBlocksInScratch = function() {
 
         //add the parameter to wait block
         if (code_to_block[codes[i]] == 60) {
+          // Event to change parameter
           var changeEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.CHANGE, blockId: this_block.childBlocks_[0].id,
                   element: "field", name: "NUM", newValue: code_to_block[pars.shift()]}, workspace);
-          changeEvent.run(true); // Event to change parameter
+          changeEvent.run(true);
         }
         //add the parameter to play sound block
         if (code_to_block[codes[i]] == 37) {
           // something is wrong with the change event in dropdown menus (error when the block is  deleted)
-          // for now: no dropdown menus in blocks -> it is a number input area
+          // for now: no dropdown menus in blocks -> the way blocks are were change (in scratch-blocks) and it is a number input area
+          // Event to change parameter
           // var changeEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.CHANGE, blockId: block.childBlocks_[0].id,
           //         element: "field", name: "SOUND_MENU", newValue: code_to_block[pars.shift()]}, workspace);
-          // changeEvent.run(true); // Event to change parameter
+          // changeEvent.run(true);
+
+          // Event to change parameter
           var changeEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.CHANGE, blockId: this_block.childBlocks_[0].id,
                   element: "field", name: "NUM", newValue: code_to_block[pars.shift()]}, workspace);
-          changeEvent.run(true); // Event to change parameter
+          changeEvent.run(true);
         }
         //add the parameter to play drum block
         if (code_to_block[codes[i]] == 39) {
+          // Event to change parameter
           var changeEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.CHANGE, blockId: this_block.childBlocks_[0].id,
                   element: "field", name: "NUM", newValue: code_to_block[pars.shift()]+1}, workspace);
-          changeEvent.run(true); // Event to change parameter
+          changeEvent.run(true);
         }
         //add the parameter to repeat block
         if (code_to_block[codes[i]] == 61) {
+          // Event to change parameter
           var changeEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.CHANGE, blockId: this_block.childBlocks_[0].id,
                   element: "field", name: "NUM", newValue: code_to_block[pars.shift()]}, workspace);
-          changeEvent.run(true); // Event to change parameter
+          changeEvent.run(true);
         }
       }
-
+      // if another block was created before this current block needs to be connected to the other one
   		if (last_id.localeCompare("") != 0) {
   			child_id = this_block.id;
   			parent_id = last_id;
-        if (code_to_block[codes[i-1]] != null && code_to_block[codes[i-1]] == 61) { // if last block was a loop
+        if (code_to_block[codes[i-1]] != null && code_to_block[codes[i-1]] == 61) { // if last block was a repeat
           last_repeat_id = last_id; // save id
+          // create event to put the block inside the repeat
           var moveEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.MOVE, blockId: child_id,
                    newParentId: parent_id, newInputName: "SUBSTACK"}, workspace);
-          moveEvent.run(true); // Event to connect the blocks
+          moveEvent.run(true);
 
         }
         else if (code_to_block[codes[i-1]] != null && code_to_block[codes[i-1]] == 65) { // if last block was a if_key
           last_if_key_id = "IKWpZp(dKlen,JmlBU4n"; // save if block id of the if_key block
+          // create event to put the block inside the if_key block
           var moveEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.MOVE, blockId: child_id,
                    newParentId: "IKWpZp(dKlen,JmlBU4n", newInputName: "SUBSTACK"}, workspace);
-          moveEvent.run(true); // Event to connect the blocks
+          moveEvent.run(true);
 
         }
         else {
@@ -210,35 +222,35 @@ createBlocksInScratch = function() {
             flag_end_if_key = false;
             parent_id = last_if_key_id;
           }
+          // Event to connect the blocks
           var moveEvent = new window.Blockly.Events.fromJson({type: Blockly.Events.MOVE, blockId: child_id,
                    newParentId: parent_id}, workspace);
-          moveEvent.run(true); // Event to connect the blocks
+          moveEvent.run(true);
         }
       }
       last_id = this_block.id;
     }
-    //
 	}
   old_codes = codes_detected;
   stop_reading = false;
 
 }
 
-// when the spcabar is pressed the blocks are created in Scratch and then the code runs
+// when the spacebar is pressed the blocks are created in Scratch and then the code runs
 document.addEventListener('keydown', function (e) {
   if(e.keyCode == 32) {
     stop_reading = true;
-    console.log("space key");
+    //console.log("space key");
     var myAudio = document.getElementById("myAudio");
     myAudio.play();
 
 
-    // DEBUG
-    codes = [0, 7, 2, 2, 8, 2];
-    pars = [21, 11, 11, 11];
+    // DEBUG --- markers are inverted, create the list starting from the last marker from the code you want to test
+    // last_codes_detected = [0, 7, 2, 2, 8, 2];
+    // par_list_last = [21, 11, 11, 11];
 
     // time to create blocks before it runs
-    var time = 1.5 + 0.25 * (codes.length - 1);
+    var time = 1.5 + 0.25 * (last_codes_detected.length - 1);
     var createBlocks = new Promise(function(resolve) {
           createBlocksInScratch();
           setTimeout(function() {
@@ -246,8 +258,8 @@ document.addEventListener('keydown', function (e) {
           }, (1000 * time ));
     });
     createBlocks.then(function() {
-      Scratch.vm.greenFlag();
       myAudio.play();
+      Scratch.vm.greenFlag();
     });
     e.preventDefault();
   }
@@ -290,6 +302,8 @@ window.ARThreeOnLoad = function() {
 				document.body.className += ' desktop';
 			}
 		}
+
+    //hidden the canvas with the camera view
 		renderer.domElement.style.visibility = "hidden";
 		renderer.setSize(0, 0);
 
@@ -308,7 +322,7 @@ window.ARThreeOnLoad = function() {
             matrix: new Float32Array(16)
           }
           // if the code is not for a parameter, put it in the codes_detected list
-          if (barcodeId < 7 || barcodeId == 63) {
+          if (barcodeId < 10 || barcodeId == 63) {
   					detectedBarcodeMarkers[barcodeId].visible = true;
             detectedBarcodeMarkers[barcodeId].pos.push(getPosition(ev.data.marker.pos));
   					//detectedBarcodeMarkers[barcodeId].pos.push(ev.data.marker.pos);
@@ -336,7 +350,7 @@ window.ARThreeOnLoad = function() {
         else {
           if (checkBlock(detectedBarcodeMarkers[barcodeId].pos, getPosition(ev.data.marker.pos)) == -1) {
           //if the barcode detected was not added to the list, add it
-            if (barcodeId < 7 || barcodeId == 63) {
+            if (barcodeId < 10 || barcodeId == 63) {
               // if the code is not for a parameter, put it in the codes_detected list
               detectedBarcodeMarkers[barcodeId].pos.push(getPosition(ev.data.marker.pos));
 
@@ -369,6 +383,38 @@ window.ARThreeOnLoad = function() {
           par_list_last = par_list;
           par_list = [];
 
+
+          //===== CHECK MARKERS ================================
+          //===== check if the markers recognition is recognizing the expected markers in the camera view
+          // var code_markers = [0, 2];
+          // code_markers = [0, 2, 2];
+          // code_markers = [0, 8, 2, 7];
+          // code_markers = [0, 6, 2, 5];
+          // code_markers = [0, 2, 6, 2, 5];
+          // code_markers = [0, 6, 2, 2, 5];
+          //
+          //
+          // if (!checkMarkers(code_markers, last_codes_detected)) {
+          //   console.log("Expected command list", code_markers);
+          //   console.log("Recognized parameter list", last_codes_detected);
+          // }
+          //
+          // var par_markers = [10];
+          // par_markers = [10, 10];
+          // par_markers = [10, 11];
+          // par_markers = [10, 22];
+          // par_markers = [10, 12];
+          // par_markers = [10, 10, 12];
+          // par_markers = [11, 10, 13];
+          //
+          //
+          // if (!checkMarkers(par_markers, par_list_last)) {
+          //   console.log("Expected command list", par_markers);
+          //   console.log("Recognized parameter list", par_list_last);
+          // }
+          //==============================================================
+          //==============================================================
+
           //add the green flag - 0 - in the list again
 					detectedBarcodeMarkers[barcodeId] = {
 						visible: true,
@@ -396,4 +442,16 @@ window.ARThreeOnLoad = function() {
 
 if (window.ARController && ARController.getUserMediaThreeScene) {
 	ARThreeOnLoad();
+}
+
+checkMarkers = function(base_list, test_list) {
+  if (!test_list)
+      return false;
+  else if (base_list.length != test_list.length)
+      return false;
+  for (var i = 0, l= base_list.length; i < l; i++) {
+      if (!(base_list[i] == test_list[i]))
+              return false;
+  }
+  return true;
 }
