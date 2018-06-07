@@ -11,18 +11,22 @@
 [![Greenkeeper badge](https://badges.greenkeeper.io/LLK/scratch-vm.svg)](https://greenkeeper.io/)
 
 ## Installation -- JUST RUN THE SERVER -- DO NOT 'NPM INSTALL'
-This requires you to have Git and Node.js installed.
+~This requires you to have Git and Node.js installed.~
 
-To install as a dependency for your own application:
-```bash
-npm install scratch-vm
-```
+~To install as a dependency for your own application:~
+
+~npm install scratch-vm~
+
 To set up a development environment to edit scratch-vm yourself:
 ```bash
 git clone https://github.com/LLK/scratch-vm.git
 cd scratch-vm
-~~npm install~~
 ```
+
+~npm install~
+
+
+
 
 ## Development Server
 This requires Node.js to be installed.
